@@ -18,5 +18,5 @@ https://github.com/swigger/wechat-ocr
 
 ``` java
 WeChatOCR.load();
-String text = WeChatOCR.apply(path);
+Result result = WeChatOCR.apply(path);
 ```
