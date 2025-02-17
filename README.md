@@ -14,6 +14,8 @@ https://github.com/swigger/wechat-ocr
 目前只能在 `windows x64` 环境下运行
 
 ## 使用
+可能需要手动上传到本地仓库, 再引入坐标
+
 ``` java
 WeChatOCR.load();
 String text = WeChatOCR.apply(path);
