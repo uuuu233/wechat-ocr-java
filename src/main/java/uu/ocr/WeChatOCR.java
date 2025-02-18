@@ -81,9 +81,8 @@ public class WeChatOCR {
         File tempFile = new File(tempDir);
         if (tempFile.isDirectory()) {
             FileUtils.deleteDirectory(tempFile);
-        } else {
-            tempFile.mkdirs();
         }
+        tempFile.mkdirs();
         File libsDir = Path.of(System.getenv("APPDATA"), "WeChatOCR", "libs").toFile();
         libsDir.mkdirs();
 
