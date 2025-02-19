@@ -35,25 +35,33 @@ public class WeChatOCR {
 
     @SneakyThrows
     public static Result apply(String path) {
-        if (path.toLowerCase().startsWith("http")) {
-            return apply(okhttp.newCall(new Request.Builder().get().url(path).build()).execute().body().bytes());
-        }
-        AtomicReference<String> reference = new AtomicReference<>();
-        dll.wechat_ocr(new WString(wxocrDll), new WString(mmmojoDirectory), path, reference::set);
-        JsonNode jsonNode = objectMapper.readTree(reference.get());
-        Result result = objectMapper.treeToValue(jsonNode, Result.class);
-        result.setSuccess(jsonNode.path("errcode").asInt(1) == 0);
-        StringBuilder sb = new StringBuilder();
-        List<Item> data = result.getData();
-        int end = data.size() - 1;
-        for (int i = 0; i < data.size(); i++) {
-            sb.append(data.get(i).getText());
-            if (i < end) {
-                sb.append(" ");
+        try {
+            if (path.toLowerCase().startsWith("http")) {
+                return apply(okhttp.newCall(new Request.Builder().get().url(path).build()).execute().body().bytes());
             }
+            AtomicReference<String> reference = new AtomicReference<>();
+            dll.wechat_ocr(new WString(wxocrDll), new WString(mmmojoDirectory), path, reference::set);
+            JsonNode jsonNode = objectMapper.readTree(reference.get());
+            Result result = objectMapper.treeToValue(jsonNode, Result.class);
+            result.setSuccess(jsonNode.path("errcode").asInt(1) == 0);
+            StringBuilder sb = new StringBuilder();
+            List<Item> data = result.getData();
+            int end = data.size() - 1;
+            for (int i = 0; i < data.size(); i++) {
+                sb.append(data.get(i).getText());
+                if (i < end) {
+                    sb.append(" ");
+                }
+            }
+            result.setText(sb.toString());
+            return result;
+        } catch (Exception e) {
+            Result result = new Result();
+            result.setSuccess(false);
+            result.setMsg(e.getMessage());
+            result.setException(e);
+            return result;
         }
-        result.setText(sb.toString());
-        return result;
     }
 
     @SneakyThrows

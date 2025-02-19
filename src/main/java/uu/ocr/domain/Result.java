@@ -9,6 +9,8 @@ import java.util.List;
 @Data
 public class Result {
     private boolean success;
+    private String msg;
+    private Exception exception;
     private String width;
     private String height;
     private String text;

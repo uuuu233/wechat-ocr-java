@@ -13,6 +13,8 @@ https://github.com/swigger/wechat-ocr
 
 目前只能在 `windows x64` 环境下运行
 
+可能某些 CPU 缺少一些集指令导致无法正常工作
+
 ## 使用
 可能需要手动上传到本地仓库, 再引入坐标
 
@@ -23,9 +25,9 @@ Result result = WeChatOCR.apply(path);
 
 ``` bat
 mvn install:install-file ^
--Dfile=wechat-ocr-java-1.0.1.jar ^
+-Dfile=wechat-ocr-java-1.1.0.jar ^
 -DgroupId=uu ^ 
 -DartifactId=wechat-ocr-java ^
--Dversion=1.0.1 ^
+-Dversion=1.1.0 ^
 -Dpackaging=jar
 ```
