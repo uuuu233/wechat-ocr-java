@@ -20,3 +20,12 @@ https://github.com/swigger/wechat-ocr
 WeChatOCR.load();
 Result result = WeChatOCR.apply(path);
 ```
+
+``` bat
+mvn install:install-file ^
+-Dfile=wechat-ocr-java-1.0.1.jar ^
+-DgroupId=uu ^ 
+-DartifactId=wechat-ocr-java ^
+-Dversion=1.0.1 ^
+-Dpackaging=jar
+```
