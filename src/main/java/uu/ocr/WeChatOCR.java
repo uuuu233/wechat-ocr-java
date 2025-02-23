@@ -32,6 +32,11 @@ public class WeChatOCR {
     private static OkHttpClient okhttp = new OkHttpClient();
     private static ObjectMapper objectMapper = new ObjectMapper();
     private static boolean loaded = false;
+    private static final String CURRENT_VERSION = "1";
+
+    private WeChatOCR() {
+
+    }
 
     @SneakyThrows
     public static Result apply(String path) {
@@ -92,10 +97,11 @@ public class WeChatOCR {
         }
         tempFile.mkdirs();
         File libsDir = Path.of(System.getenv("APPDATA"), "WeChatOCR", "libs").toFile();
-        libsDir.mkdirs();
 
         File versionFile = new File(libsDir, "version.txt");
-        if (!versionFile.isFile() || !"1".equals(new String(Files.readAllBytes(versionFile.toPath())))) {
+        if (!versionFile.isFile() || !CURRENT_VERSION.equals(new String(Files.readAllBytes(versionFile.toPath())))) {
+            FileUtils.deleteDirectory(libsDir);
+            libsDir.mkdirs();
             Path libsPath = Paths.get(WeChatOCR.class.getResource("/libs/").toURI());
             copyResourceFiles(libsPath, libsPath.toString().length(), libsDir);
         }
