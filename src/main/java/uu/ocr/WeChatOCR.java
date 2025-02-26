@@ -14,25 +14,22 @@ import org.apache.commons.io.FileUtils;
 import uu.ocr.domain.Item;
 import uu.ocr.domain.Result;
 
-import java.io.FileOutputStream;
 import java.io.IOException;
-import java.net.URISyntaxException;
-import java.nio.file.DirectoryStream;
+import java.io.InputStream;
 import java.nio.file.Files;
 import java.nio.file.Path;
-import java.nio.file.Paths;
 import java.util.*;
 import java.util.concurrent.atomic.AtomicReference;
 
 public class WeChatOCR {
     private static String mmmojoDirectory;
-    private static String wxocrDll;
+    private static String wechatBinary;
     private static String tempDirectory;
     private static WeChatOCRLibrary dll;
     private static OkHttpClient okhttp = new OkHttpClient();
     private static ObjectMapper objectMapper = new ObjectMapper();
     private static boolean loaded = false;
-    private static final String CURRENT_VERSION = "1";
+    private static final String CURRENT_VERSION = "3";
 
     private WeChatOCR() {
 
@@ -45,7 +42,7 @@ public class WeChatOCR {
                 return apply(okhttp.newCall(new Request.Builder().get().url(path).build()).execute().body().bytes());
             }
             AtomicReference<String> reference = new AtomicReference<>();
-            dll.wechat_ocr(new WString(wxocrDll), new WString(mmmojoDirectory), path, reference::set);
+            dll.wechat_ocr(new WString(wechatBinary), new WString(mmmojoDirectory), path, reference::set);
             JsonNode jsonNode = objectMapper.readTree(reference.get());
             Result result = objectMapper.treeToValue(jsonNode, Result.class);
             result.setSuccess(jsonNode.path("errcode").asInt(1) == 0);
@@ -85,54 +82,45 @@ public class WeChatOCR {
         return tempDirectory;
     }
 
-    public static void load(String tempDir) throws IOException, URISyntaxException {
+    public static synchronized void load(String tempDir) throws IOException {
         if (loaded) {
             return;
         }
         objectMapper.configure(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES , false);
         tempDirectory = tempDir;
+        // 清空临时目录
         File tempFile = new File(tempDir);
         if (tempFile.isDirectory()) {
             FileUtils.deleteDirectory(tempFile);
         }
         tempFile.mkdirs();
-        File libsDir = Path.of(System.getenv("APPDATA"), "WeChatOCR", "libs").toFile();
 
-        File versionFile = new File(libsDir, "version.txt");
+        File libDir = Path.of(System.getenv("APPDATA"), "WeChatOCR", "lib").toFile();
+
+        // 检查依赖版本
+        File versionFile = new File(libDir, "version");
         if (!versionFile.isFile() || !CURRENT_VERSION.equals(new String(Files.readAllBytes(versionFile.toPath())))) {
-            FileUtils.deleteDirectory(libsDir);
-            libsDir.mkdirs();
-            Path libsPath = Paths.get(WeChatOCR.class.getResource("/libs/").toURI());
-            copyResourceFiles(libsPath, libsPath.toString().length(), libsDir);
+            FileUtils.deleteDirectory(libDir);
+            libDir.mkdirs();
+            try (InputStream lfl = WeChatOCR.class.getResourceAsStream("/lib-file-list")) {
+                for (String s : new String(lfl.readAllBytes()).split("\n")) {
+                    try (InputStream f = WeChatOCR.class.getResourceAsStream("/lib/" + s)) {
+                        FileUtils.writeByteArrayToFile(new File(libDir, s), f.readAllBytes());
+                    }
+                }
+            }
         }
 
-        mmmojoDirectory = Path.of(libsDir.getPath(), "mmmojo").toString();
-        wxocrDll = Path.of(libsDir.getPath(), "wxocr.dll").toString();
+        mmmojoDirectory = Path.of(libDir.getPath()).toString();
+        wechatBinary = Path.of(libDir.getPath(), "WeChatOCR", "WeChatOCR.exe").toString();
 
-        dll = Native.load(Path.of(libsDir.getPath(), "wcocr.dll").toString(), WeChatOCRLibrary.class, Collections.singletonMap(Library.OPTION_STRING_ENCODING, "UTF-8"));
+        dll = Native.load(Path.of(libDir.getPath(), "wcocr.dll").toString(), WeChatOCRLibrary.class, Collections.singletonMap(Library.OPTION_STRING_ENCODING, "UTF-8"));
         Runtime.getRuntime().addShutdownHook(new Thread(dll::stop_ocr));
         loaded = true;
     }
 
-    public static void load() throws IOException, URISyntaxException {
+    public static void load() throws IOException {
         load(Path.of(System.getenv("APPDATA"), "WeChatOCR", "temp").toFile().getCanonicalPath());
-    }
-
-    private static void copyResourceFiles(Path path, int deletePrefixLength, File libsDir) throws IOException {
-        String subpath = path.toString().substring(deletePrefixLength);
-        if (Files.isDirectory(path)) {
-            // 新建文件夹
-            new File(libsDir, subpath).mkdirs();
-            try (DirectoryStream<Path> stream = Files.newDirectoryStream(path)) {
-                for (Path file : stream) {
-                    copyResourceFiles(file, deletePrefixLength, libsDir);
-                }
-            }
-        } else {
-            try (FileOutputStream fos = new FileOutputStream(new File(libsDir, subpath))) {
-                Files.copy(path, fos);
-            }
-        }
     }
 
     public interface WeChatOCRLibrary extends Library {
