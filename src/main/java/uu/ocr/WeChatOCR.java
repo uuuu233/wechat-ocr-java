@@ -46,16 +46,6 @@ public class WeChatOCR {
             JsonNode jsonNode = objectMapper.readTree(reference.get());
             Result result = objectMapper.treeToValue(jsonNode, Result.class);
             result.setSuccess(jsonNode.path("errcode").asInt(1) == 0);
-            StringBuilder sb = new StringBuilder();
-            List<Item> data = result.getData();
-            int end = data.size() - 1;
-            for (int i = 0; i < data.size(); i++) {
-                sb.append(data.get(i).getText());
-                if (i < end) {
-                    sb.append(" ");
-                }
-            }
-            result.setText(sb.toString());
             return result;
         } catch (Exception e) {
             Result result = new Result();
