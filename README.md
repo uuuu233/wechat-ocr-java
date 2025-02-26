@@ -1,10 +1,12 @@
 # wechat-ocr-java
-使用 wechat 的 ocr 组件, 开箱即用的 ocr
+使用 WeChat 的 OCR 插件, 开箱即用
 
-轻量化, 简单, 一般情况下无需环境
+轻量化, 简单, 速度快
 
 ## 感谢
 https://github.com/swigger/wechat-ocr
+
+https://github.com/EEEEhex/qqimpl
 
 ## 说明
 由于 WeChat 是基于本地路径的, 图片会本地保存, 再识别
@@ -26,14 +28,15 @@ https://github.com/swigger/wechat-ocr
 
 ``` java
 WeChatOCR.load(); // 仅一次
+String path = "文件路径";
 Result result = WeChatOCR.apply(path);
 ```
 
 ``` bat
 mvn install:install-file ^
--Dfile=wechat-ocr-java-1.1.0.jar ^
+-Dfile=wechat-ocr-java-1.2.0.jar ^
 -DgroupId=uu ^ 
 -DartifactId=wechat-ocr-java ^
--Dversion=1.1.0 ^
+-Dversion=1.2.0 ^
 -Dpackaging=jar
 ```
