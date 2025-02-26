@@ -3,11 +3,6 @@
 
 轻量化, 简单, 速度快
 
-## 感谢
-https://github.com/swigger/wechat-ocr
-
-https://github.com/EEEEhex/qqimpl
-
 ## 说明
 由于 WeChat 是基于本地路径的, 图片会本地保存, 再识别
 
@@ -40,3 +35,8 @@ mvn install:install-file ^
 -Dversion=1.2.0 ^
 -Dpackaging=jar
 ```
+
+## 感谢
+https://github.com/swigger/wechat-ocr
+
+https://github.com/EEEEhex/qqimpl
