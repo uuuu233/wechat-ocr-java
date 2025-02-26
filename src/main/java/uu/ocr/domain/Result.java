@@ -12,7 +12,7 @@ import java.util.List;
 
 @Data
 public class Result {
-    private boolean success;
+    private Boolean success;
     private String msg;
     @JsonIgnore
     private Exception exception;
@@ -38,5 +38,9 @@ public class Result {
             text = sb.toString();
         }
         return text;
+    }
+
+    public void setSuccess(Boolean success) {
+        this.success = success != null && success;
     }
 }
