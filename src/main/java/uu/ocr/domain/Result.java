@@ -2,7 +2,10 @@ package uu.ocr.domain;
 
 import com.fasterxml.jackson.annotation.JsonAlias;
 import com.fasterxml.jackson.annotation.JsonIgnore;
+import lombok.AccessLevel;
 import lombok.Data;
+import lombok.Getter;
+import lombok.Setter;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -17,6 +20,8 @@ public class Result {
     private double height;
     @JsonAlias("ocr_response")
     private List<Item> data = new ArrayList<>();
+    @Getter(AccessLevel.NONE)
+    @Setter(AccessLevel.NONE)
     @JsonIgnore
     private String text;
 
