@@ -86,7 +86,6 @@ public class WeChatOCR {
         }
         tempFile.mkdirs();
 
-
         mmmojoDirectory = libDir;
         wechatBinary = Path.of(libDir, "lib", "WeChatOCR.exe").toString();
 

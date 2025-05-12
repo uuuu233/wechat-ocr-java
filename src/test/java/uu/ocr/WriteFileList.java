@@ -10,7 +10,7 @@ import java.nio.file.attribute.BasicFileAttributes;
 
 public class WriteFileList {
     public static void main(String[] args) throws URISyntaxException, IOException {
-        Path path = Paths.get(WriteFileList.class.getResource("/lib").toURI());
+        Path path = Paths.get(WriteFileList.class.getResource("/WeChatOCR").toURI());
         int prefixLength = path.toString().length() + 1;
         StringBuilder sb = new StringBuilder();
         Files.walkFileTree(path, new SimpleFileVisitor<Path>() {
